@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="btnB">发送消息</button>
+    <script>
+        // 接收方
+        const aWorker = new SharedWorker('./worker.js')
+        aWorker.port.onmessage = e => {
+            console.info("pageA收到消息", e.data)
+        }
+
+        // 发送方
+        const sWorker = new SharedWorker('./worker.js')
+        let btnB = document.getElementById("btnB");
+        let num = 0;
+        btnB.addEventListener("click", () => {
+            sWorker.port.postMessage(`客户端B发送的消息:${num++}`)
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>innerHTML</title>
+</head>
+<body>
+    <div id="app"></div>
+    <div id="app1"></div>
+    <script>
+        const data = [{
+            tag: 'div',
+            props: {
+                id: 'test',
+                class: 'test'
+            },
+            children: [
+                {
+                    tag: 'p',
+                    props: {
+                        class: 'text'
+                    },
+                    children: [
+                        {
+                            text: 'hello world!!!'
+                        },
+                        {
+                            tag: 'p',
+                            props: {
+                                class: 'text-1'
+                            },
+                            children: [
+                                {
+                                    text: 'hello world!!!-1'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    tag: 'script',
+                    children: [
+                        {
+                            text: '测试121212<div>'
+                        }
+                    ]
+                }
+            ]
+        }];
+        /**
+        * 渲染元素
+        * @param {*} domCtn: dom容器 
+        * @param {*} data: {tag: 'div', props: {}, children: []}
+        * @returns 无
+        */
+        const renderHTML = (domCtn = null, data = []) => {
+            console.log(data);
+            // dom节点是否有效
+            if (!domCtn) {
+                console.error('renderHTML params domCtn is required');
+                return;
+            }
+            // data参数是否是对象类型
+            if (!(data instanceof Array)) {
+                console.error('renderHTML params data必须是数组类型');
+                return;
+            }
+            // data为空则清除dom元素值
+            if (data.length === 0) {
+                // 子节点
+                const childNodes = domCtn.childNodes;
+                (childNodes || []).forEach(node => {
+                    domCtn.removeChild(node);
+                });
+                return;
+            }
+            
+            // deep循环
+            const deepDomData = (dDom = null, dData = {}) => {
+                const {
+                    tag = '',
+                    props = {},
+                    children = [],
+                    text = ''
+                } = dData;
+                // 是否元素类型
+                const isElementType = tag === '';
+                // 是否文本类型
+                const isTextType = text === '';
+                // 非节点 && 非文本
+                if (!isElementType && !isTextType) {
+                    return;
+                }
+                // 节点类型
+                if (!isTextType) {
+                    // 若文本中有标签时需要转化
+                    const textNode = document.createTextNode(text);
+                    dDom.append(textNode);
+                } else {
+                    // 元素类型
+                    // 创建节点, 针对script标签元素直接通过code包装
+                    const tagLower = tag.toLowerCase();
+                    const currNode = document.createElement(tagLower);
+                    // 属性
+                    const propKeys = Object.keys(props);
+                    // 若有属性
+                    if (propKeys.length !== 0) {
+                        propKeys.forEach(key => {
+                            currNode.setAttribute(key, props[key]);
+                        });
+                    }
+                    // 子节点
+                    (children || []).forEach(node => {
+                        deepDomData(currNode, node);
+                    });
+                    // script标签的话则用code包裹
+                    if (tagLower === 'script') {
+                        const codeNode = document.createElement('code');
+                        codeNode.textContent = '<script>' + currNode.textContent + '<\/script>';
+                        dDom.append(codeNode);
+                    } else {
+                        // 直接插入
+                        dDom.append(currNode);
+                    }
+                }
+            };
+            // 调用
+            data.forEach(dataVal => {
+                deepDomData(domCtn, dataVal);
+            });
+        };
+        // renderHTML(document.getElementById('app'), data);
+
+        /**
+        * 字符串转数据
+        * @param {*} domStr: dom字符串
+        * @returns 无
+        */
+        const transformStrToData = (domStr = '') => {
+            const tempDom = document.createElement('div');
+            tempDom.innerHTML = domStr;
+
+            const data = {};
+            // deep节点元素
+            const deepNode = (dChildNodes, pData) => {
+                pData.children = pData.children || [];
+                dChildNodes.forEach(node => {
+                    // 条目数据
+                    const itemData = {};
+                    const {nodeName, nodeType, childNodes, attributes} = node;
+                    // 文本节点
+                    if (nodeType === 3) {
+                        itemData.text = node.textContent;
+                    } else if (nodeType === 1) {
+                        // 元素节点
+                        // 设置属性
+                        const props = {};
+                        Object.keys(attributes).forEach(key => {
+                            const propKey = attributes[key].name;
+                            props[propKey] = node.getAttribute(propKey);
+                        });
+                        // 添加数据
+                        itemData.tag = nodeName.toLowerCase();
+                        itemData.props = props;
+                        // 若子节点不为空
+                        if (childNodes.length !== 0) {
+                            deepNode(childNodes, itemData);
+                        }
+                    }
+                    pData.children.push(itemData);
+                });
+            };
+            deepNode(Array.from(tempDom.childNodes), data);
+            return data.children;
+        }
+
+        const d = transformStrToData('<div id="app2"><div id="test2" onclick="test()"><p class="text" style="height: 300px;">hello world!!!<p class="text-1">hello world!!!-1</p></div><script>alert("adsdcsd")<\/script></div>');
+        renderHTML(document.getElementById('app1'), d);
+
+        // 清除元素
+        // setTimeout(() => {
+        //     renderHTML(document.getElementById('app'), []);
+        // }, 3000);
+    </script>
+    <!-- https://juejin.cn/post/6844903811601924103 -->
+</body>
+</html>

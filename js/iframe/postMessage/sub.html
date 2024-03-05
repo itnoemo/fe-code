@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>main</title>
+</head>
+<body>
+    <h1 id="h1">子元素初始值</h1>
+    <script>
+        window.addEventListener('message', e => {
+            if (e.origin === 'http://localhost.com:8081') {
+                const msg = e.data;
+                document.getElementById('h1').innerText = msg;
+                parent.postMessage('子窗口已接收，值为' + msg, 'http://localhost.com:8081');
+            }
+        }, false);
+    </script>
+</body>
+</html>

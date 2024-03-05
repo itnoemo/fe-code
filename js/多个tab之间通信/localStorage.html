@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="btnB">添加数据到localStorage</button>
+</body>
+  <script>
+    /**
+     *  优点:
+     *      1、同域共享存储空间
+            2、持久化将数据存储来浏览器
+            3、提供事件监听localStorage变化
+        缺点:
+            如果多个标签页跨域了，那么数据将无法共享
+    */
+   // 目标页面A
+    window.addEventListener("storage", (e) => {
+      console.info("localStorage发生变化：", e)
+    })
+    
+    // 通知页面B
+    let btnB = document.getElementById("btnB");
+    let num = 0;
+    btnB.addEventListener("click", () => {
+        localStorage.setItem("num", num++)
+    });
+  </script>
+</html>

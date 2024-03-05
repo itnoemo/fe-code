@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>main</title>
+</head>
+<body>
+    <button onclick="sendMsg()">发送消息</button>
+    <iframe id="iframeTest" src="http://localhost.com:8082/sub.html"></iframe>
+    <script>
+        var name = '张三';
+        // 发送消息
+        function sendMsg() {
+            var iframeDom = document.getElementById('iframeTest');
+            name+='_1';
+            iframeDom.contentWindow.postMessage(name, 'http://localhost.com:8082');
+        }
+        window.addEventListener('message', e => {
+            if (e.origin === 'http://localhost.com:8082') {
+                console.log('父窗口收到的消息为' + e.data);
+            }
+        }, false);
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+dl,
+dd,
+ol,
+ul,
+menu,
+p,
+pre,
+blockquote,
+figure,
+fieldset {
+    margin: 0;
+}
+
+ol,
+ul,
+menu,
+fieldset,
+input,
+textarea {
+    padding: 0;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: 100%;
+    margin: 0;
+}
+
+th {
+    text-align: inherit;
+}
+
+i {
+    font-style: normal;
+}
+
+/*setting*/
+
+body,
+button,
+input,
+select,
+textarea {
+    /* 不再设定 font-size，因为在 mobile 环境中需要考虑 responsive typography，即使在 desktop 环境中，单独为 button input 这些设定 font-size 也会妨碍利用 inheritance 特性 */
+    font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", "Microsoft YaHei", sans-serif;
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+img {
+    display: block;
+}
+
+ol {
+    list-style-type: decimal;
+    list-style-position: inside;
+}
+
+.cf:before,
+.cf:after {
+    content: " ";
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}

@@ -1,0 +1,46 @@
+{
+  "name": "jssdk-demo-vue",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "cross-env NODE_MODE=development webpack server --config ./scripts/webpack.dev.js --progress --color",
+    "prod": "cross-env NODE_MODE=production webpack server --config ./scripts/webpack.prod.js --progress --color",
+    "build:dev": "cross-env NODE_MODE=development webpack --config ./scripts/webpack.dev.js --progress --color",
+    "build:prop": "cross-env NODE_MODE=production webpack --config ./scripts/webpack.prod.js --progress --color"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.18.9",
+    "@vue/babel-preset-app": "^5.0.8",
+    "@vue/compiler-sfc": "^3.2.37",
+    "babel-loader": "^8.2.5",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.7.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "less": "^3.12.2",
+    "less-loader": "^6.2.0",
+    "md5": "^2.3.0",
+    "querystring": "^0.2.1",
+    "style-loader": "^3.3.1",
+    "stylelint": "^14.10.0",
+    "url-loader": "^4.1.1",
+    "vue-loader": "^17.0.0",
+    "vue-template-compiler": "^2.7.9",
+    "webpack": "^5.62.1",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.4.0",
+    "webpack-merge": "^5.8.0"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "2.0.9",
+    "classnames": "^2.3.1",
+    "element-plus": "^2.2.14",
+    "lodash": "^4.17.21",
+    "path-browserify": "^1.0.1",
+    "vue": "^3.2.13",
+    "vue-fragment": "^1.6.0",
+    "vue-router": "^4.1.4",
+    "vuex": "^4.0.0"
+  }
+}

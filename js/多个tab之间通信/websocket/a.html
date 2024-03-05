@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PageA</title>
+</head>
+<body>
+    <button id="btnB">发送信息</button>
+    // 接收方
+    <script>
+        // 接收方
+        // 创建一个websocket连接
+        var ws = new WebSocket('ws://localhost:3000/');
+        // WebSocket连接成功回调
+        ws.onopen = function () {
+            console.log("websocket连接成功")
+        }
+        // 这里接受服务器端发过来的消息
+        ws.onmessage = function (e) {
+            console.log("服务端发送的消息", e.data)
+        }
+    </script>
+    <script>
+        // 发送方
+        let btnB = document.getElementById("btnB");
+        let num = 0;
+        btnB.addEventListener("click", () => {
+          ws.send(`客户端B发送的消息:${num++}`);
+        })
+        // 创建一个websocket连接
+        var ws = new WebSocket('ws://localhost:3000/');
+        // WebSocket连接成功回调
+        ws.onopen = function () {
+          console.log("websocket连接成功")
+        }
+      </script>
+</body>
+</html>
