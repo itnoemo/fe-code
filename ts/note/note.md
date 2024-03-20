@@ -141,6 +141,25 @@ console.log(str)
 ```
 
 
+
+
+
+
+****
+# any 类型
+
+- 概念
+  - 表示没有任何限制，该类型的变量可以赋予任意类型的值
+  - 变量类型一旦设为any，TypeScript 实际上会关闭这个变量的类型检查。即使有明显的类型错误，只要句法正确，都不会报错
+  ```typescript
+  let x: any = "hello";
+  x(1); // 不报错
+  x.foo = 100; // 不报错
+  ```
+- 场景
+  - 出于特殊原因，需要关闭某些变量的类型检查，就可以把该变量的类型设为any
+  - 为了适配以前老的 JavaScript 项目，让代码快速迁移到 TypeScript，可以把变量类型设为any
+****
 # unknown 类型
 - 概念
   - 它与any含义相同，表示类型不确定，可能是任意类型
@@ -180,7 +199,7 @@ console.log(str)
     let a = c + 10; // 正确
   }
   ```
-
+****
 # never
 - 概念
   - 不存在任何属于“空类型”的值，即不可能有这样的值
@@ -197,7 +216,7 @@ console.log(str)
   let c2: string = c(); // 不报错
   let c3: boolean = c(); // 不报错
   ```
-
+****
 # undefined 和 null 的特殊性
 - 概念
   - undefined和null既是值，又是类型。
@@ -208,12 +227,64 @@ console.log(str)
   age = null; // 正确
   age = undefined; // 正确
   ```
+  - 如果没有声明类型的变量，被赋值为undefined或null，它们的类型会被推断为any。
+  ```ts
+  let a = undefined; // any
+  const b = undefined; // any
+
+  let c = null; // any
+  const d = null; // any
+  ```
+  - 希望避免这种情况，则需要打开编译选项strictNullChecks
+  ```ts
+  // 打开编译设置 strictNullChecks
+  let a = undefined; // undefined
+  const b = undefined; // undefined
+
+  let c = null; // null
+  const d = null; // null
+  ```
+
+
 - 弊端
   - 由于 变量如果等于undefined就表示还没有赋值，如果等于null就表示值为空，故此下面
   ```typescript
   const obj: object = undefined;
   obj.toString(); // 编译不报错，运行就报错
   ```
+****
+# Object 类型与 object 类型
+## Object
+- 大写的Object类型代表 JavaScript 语言里面的广义对象。所有可以转成对象的值
+- 除了undefined和null这两个值不能转为对象，其他任何值都可以赋值给Object类型
+```ts
+let obj: Object;
+obj = true;
+obj = "hi";
+obj = 1;
+obj = { foo: 123 };
+obj = [1, 2];
+obj = (a: number) => a + 1;
+
+obj = undefined; // 报错
+obj = null; // 报错
+```
+## object
+- 代表 JavaScript 里面的狭义对象，即可以用字面量表示的对象，只包含对象、数组和函数，不包括原始类型的值
+```ts
+let obj: object;
+
+obj = { foo: 123 };
+obj = [1, 2];
+obj = (a: number) => a + 1;
+obj = true; // 报错
+obj = "hi"; // 报错
+obj = 1; // 报错
+```
+
+**无论是大写的Object类型，还是小写的object类型，都只包含 JavaScript 内置对象原生的属性和方法，用户自定义的属性和方法都不存在于这两个类型之中**
+
+****
 
 # 值类型
 - 概念
@@ -233,13 +304,30 @@ console.log(str)
   // 由于2是number的子类型，number是2的父类型，父类型不能赋值给子类型，所以报错了
   const x: 2 = 1 + 1; // 报错
 
+  // 通过 as 类型断言不报错
+  const x:2 = (1+1) as 2; // 正确
+
   // 但子类型可以赋值给父类型
   let a: 2 = 2;
   let b: number = 1 + 1;
   a = b; // 报错
   b = a; // 正确
   ```
-
+****
+# const
+- 若赋值的类型为基本类型，则推断该变量类型为 值 类型
+```ts
+// x 的类型是 "https"
+const x = "https";
+// y 的类型是 string
+const y: string = "https";
+```
+- const命令声明的变量，如果赋值为对象，并不会推断为值类型
+```ts
+// x 的类型是 { foo: number }
+const x = { foo: 1 };
+```
+****
 # 联合类型
 - 概念
   - 多个类型组成的一个新类型，使用符号|表示
@@ -1117,3 +1205,35 @@ const b: unique symbol = a; // 报错
       return (pet as Fish).swim !== undefined;
     }
     ```
+****
+# 模板字符串
+- 概念
+  - 允许使用模板字符串，构建类型
+  - 最大的特点就是 就是内部可以引用其他类型
+  ```ts
+  type World = "world";
+
+  // "hello world"
+  type Greeting = `hello ${World}`;
+  ```
+  - 模板字符串可以引用的类型一共 6 种，分别是 string、number、bigint、boolean、null、undefined。引用这 6 种以外的类型会报错
+  ```ts
+  type Num = 123;
+  type Obj = { n: 123 };
+
+  type T1 = `${Num} received`; // 正确
+  type T2 = `${Obj} received`; // 报错
+  ```
+  - 如果是一个联合类型，那么它返回的也是一个联合类型，即模板字符串可以展开联合类型
+  ```ts
+  type T = "A" | "B";
+
+  // "A_id"|"B_id"
+  type U = `${T}_id`;
+
+
+  type T1 = "A" | "B";
+  type U1 = "1" | "2";
+  // 'A1'|'A2'|'B1'|'B2'
+  type V1 = `${T1}${U1}`;
+  ```
