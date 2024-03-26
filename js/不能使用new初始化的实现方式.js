@@ -1,6 +1,5 @@
 (function() {
     var root = this;
-
     var SymbolPolyfill = function Symbol() {
         // 实现特性第 2 点：Symbol 函数前不能使用 new 命令
         if (this instanceof SymbolPolyfill) throw new TypeError('Symbol is not a constructor');

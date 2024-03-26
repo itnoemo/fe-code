@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>single-spa 入门案例</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/single-spa/5.9.5/umd/single-spa.min.js"></script>
+</head>
+<body>
+    <a href="#/home">首页</a>
+    <a href="#/about">关于</a>
+    
+    <script>
+        // 首页应用
+        const homeApp = {
+            bootstrap: [
+                // 类似于中间件，每个函数以此执行，比如vueRouter4和koa中的中间件、
+                async (baseProps) => {
+                    console.log('home应用启动啦-----1-----', '基座参数为', baseProps);
+                },
+                async (baseProps) => {
+                    console.log('home应用启动啦-----2-----', '基座参数为', baseProps);
+                }
+            ],
+            mount: async (baseProps) => {
+                console.log('home应用挂载', '基座参数为', baseProps);
+            },
+            unmount: async (baseProps) => {
+                console.log('home应用卸载', '基座参数为', baseProps);
+            }
+        };
+        // 关于应用
+        const aboutApp = {
+            bootstrap: [
+                async (baseProps) => {
+                    console.log('about应用启动啦-----1-----', '基座参数为', baseProps);
+                },
+                async (baseProps) => {
+                    console.log('about应用启动啦-----2-----', '基座参数为', baseProps);
+                }
+            ],
+            mount: async (baseProps) => {
+                console.log('about应用挂载', '基座参数为', baseProps);
+            },
+            unmount: async (baseProps) => {
+                console.log('about应用卸载', '基座参数为', baseProps);
+            }
+        };
+        // 引入相关方法
+        const { registerApplication, start } = singleSpa;
+        // 参数
+        const props = {name: '张三'}
+        // 注册home应用
+        registerApplication({
+            name: 'home',
+            app: async()=> homeApp,
+            activeWhen: location => location.hash === '#/home',
+            customProps: props
+        });
+         // 注册about应用
+         registerApplication({
+            name: 'about',
+            app: async()=> aboutApp,
+            activeWhen: location => location.hash === '#/about',
+            customProps: props
+        });
+        start();
+    </script>
+</body>
+</html>

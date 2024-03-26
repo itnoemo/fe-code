@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动画</title>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+        .animation {
+            width: 80px;
+            height: 80px;
+            background-color: #82b0d9;
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="animation">我在动着</div>
+    <script>
+        const dom = document.querySelector('.animation');
+        // 获取当前文档节点
+        const rootDom = document.documentElement || document.body;
+        // 动画
+        function animationDom() {
+            const {left, top, right, bottom} = dom.getBoundingClientRect();
+            // 获取当前视口宽度
+            const clientWidth = rootDom.clientWidth;
+            // 获取当前视口高度
+            const clientHeight = rootDom.clientHeight;
+            // 水平-从左向右移动
+            if (top === 0 && right < clientWidth) {
+                dom.style.transform = `translate(${left+1}px, 0)`;
+                return;
+            }
+            // 垂直-从上向下移动
+            if (right === clientWidth && bottom < clientHeight) {
+                dom.style.transform = `translate(${left}px,${top+1}px)`;
+                return;
+            }
+            // 水平-从右向左移动
+            if (bottom === clientHeight && left > 0) {
+                dom.style.transform = `translate(${left-1}px, ${top}px)`;
+                return;
+            }
+            // // 垂直-从下向上移动
+            if (left === 0 && top > 0) {
+                dom.style.transform = `translate(0,${top-1}px)`;
+            }
+        }
+        (function animloop(){
+            animationDom();
+            requestAnimationFrame(animloop);
+        })();
+    </script>
+    <!-- 思考： 如果说在不影响上面动画的过程中 需要执行10000个函数调用即可， 那么我们该怎么设计呢 -->
+    <script>
+        // 任务最大长度
+        const taskMaxLength = 100000;
+        // 当前执行任务的索引
+        let nextTaskIndex = 0;
+        // 定义一个函数数组
+        const funArr = new Array(taskMaxLength).fill(() => {console.log('执行任务中...', nextTaskIndex);});
+        // 思路1: 微任务， 阻塞动画的执行
+        function runMicro() {
+            if (nextTaskIndex === taskMaxLength - 1) {
+                alert('任务执行完毕');
+                return;
+            }
+            // 顺序调用任务函数
+            Promise.resolve().then(funArr[nextTaskIndex++]).then(run);
+        }
+        // runMicro();
+
+        // 思路2: 宏任务，不会阻塞动画的执行，但是帧率有所下降
+        var t = null;
+        function runMacro() {
+            if (nextTaskIndex === taskMaxLength - 1) {
+                clearTimeout(t);
+                alert('任务执行完毕');
+                return;
+            }
+            // 顺序调用任务函数
+            t = setTimeout(() => {
+                funArr[nextTaskIndex++]();
+                runMacro();
+            }, 0);
+        }
+        // runMacro();
+
+        // 思路3: requestIdleCallback特性(这个函数将在浏览器空闲时期被调用。这使开发者能够在主事件循环上执行后台和低优先级工作，而不会影响延迟关键事件，如动画和输入响应)，
+        // 效果: 不阻塞，动画丝滑
+        // requestIdleCallback: safari浏览器不兼容
+        function runRIC() {
+            if (nextTaskIndex === taskMaxLength - 1) {
+                clearTimeout(t);
+                alert('任务执行完毕');
+                return;
+            }
+            requestIdleCallback((deadline) => {
+                // 当前空闲期间剩余的估计毫秒数
+                if (deadline.timeRemaining() > 0) {
+                    funArr[nextTaskIndex++]();
+                    runRAF();
+                } else {
+                    runRAF();
+                }
+            });
+        }
+        // runRIC();
+
+        // 思路4: 借助requestIdleCallback特性，通过requestAnimationFrame来进行模拟
+        function runRAF() {
+            if (nextTaskIndex === taskMaxLength - 1) {
+                clearTimeout(t);
+                alert('任务执行完毕');
+                return;
+            }
+            // 开始时间
+            const start = Date.now();
+            requestAnimationFrame(() => {
+                // 若还有时间剩余
+                if (Date.now() - start < 16.6) {
+                    funArr[nextTaskIndex++]();
+                    runRAF();
+                } else {
+                    // 下次执行
+                    runRAF();
+                }
+            });
+        }
+        runRAF();
+        
+    </script>
+</body>
+</html>
